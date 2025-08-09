@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mavala Chatbot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chatbox {
+      width: 90%;
+      max-width: 600px;
+      background-color: #fffaf5;
+      border: 2px solid #ffa500;
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
+    }
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 8px;
+      margin: 5px 0;
+      max-width: 80%;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: #ffe5b4;
+      color: #333;
+      border: 1px solid #ffae42;
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: #fff0dc;
+      border: 1px solid #ffa500;
+      color: #222;
+    }
+    .input-container {
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #ffa500;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #e59400;
+    }
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid #ccc;
+      border-radius: 50%;
+      border-top: 3px solid #ffa500;
+      animation: spin 1s linear infinite;
+      margin-left: 5px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="chatbox">
+    <div class="messages" id="messages">
+      <div class="message bot">हर हर महादेव! I am Mavala, ready to share the legacy of Chhatrapati Shivaji Maharaj.</div>
+    </div>
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Ask your question...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      input.value = "";
+      const loadingElem = appendMessage("", 'bot', true);
+
+      try {
+        const res = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: text })
+        });
+        const data = await res.json();
+        updateMessage(loadingElem, data.answer || "Mavala is speechless. Try another question.");
+      } catch (err) {
+        updateMessage(loadingElem, "Connection failed. Try again later.");
+      }
+    }
+
+    function appendMessage(text, sender, isLoading = false) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+      if (isLoading) {
+        msgDiv.innerHTML = 'Mavala is recalling... <span class="loading"></span>';
+      } else {
+        msgDiv.textContent = text;
+      }
+      document.getElementById("messages").appendChild(msgDiv);
+      document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+      return msgDiv;
+    }
+
+    function updateMessage(msgDiv, text) {
+      msgDiv.innerHTML = text;
+    }
+
+    document.getElementById("userInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
