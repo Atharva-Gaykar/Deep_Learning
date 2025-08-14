@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Tumor Classification</title>
+  <style>
+    :root {
+      --primary: #4a6fa5;
+      --secondary: #166088;
+      --accent: #4fc3f7;
+      --light: #f8f9fa;
+      --dark: #1a202c;
+      --success: #28a745;
+      --danger: #dc3545;
+      --info: #17a2b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f0f2f5;
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* loading screen */
+    .loading_screen {
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: var(--light);
+    }
+
+    .loading_spinner {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 24rem;
+    }
+
+    .loading_content h3 {
+        transform: scale(1.5);
+        margin-left: 130px;
+        margin-top: -40px;
+    }
+
+    .rotate{
+        animation: spin 1.5s linear infinite;
+        width: fit-content;
+    }
+
+    .rotate i {
+        border-radius: 50%;
+        padding: 0.3rem;
+        transform: scale(4);
+    }
+
+    @keyframes spin {
+        0% {
+        transform: rotate(0deg);
+        }
+
+        100% {
+        transform: rotate(360deg);
+        }
+    }
+
+    /* main */
+
+    .header-icon {
+      font-size: 2.5rem;
+      animation: pulse 2s infinite;
+    }
+
+     @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--secondary);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+      background-color: rgba(23, 162, 184, 0.1);
+      border-left: 5px solid var(--info);
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .confidence {
+      font-size: 1.2rem;
+      color: var(--secondary);
+      margin-top: 0.5rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 30px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 1.5rem;
+      transition: all 0.3s ease;
+      gap: 8px;
+    }
+
+    .back-btn:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 95%;
+        padding: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .back-btn {
+        padding: 10px 20px;
+      }
+    }
+
+    footer {
+      margin-top: auto;
+      width: 100vw;
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--dark);
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .footer-icons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .footer-icons a {
+      text-decoration: none;
+      color: white;
+      font-size: medium;
+    }
+
+    .footer-icons i {
+      color: white;
+      font-size: larger;
+    }
+
+    .footer-header {
+      /* border: 2px solid white; */
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .footer-content div a {
+      text-decoration: none;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="loading_screen" id="loading_screen">
+        <div class="loading_spinner">
+            <div class="loading_content">
+                <div class="rotate"><i class="fas fa-brain header-icon"></i></div>
+                <h3>Brain Tumor Detection</h3>
+            </div>
+        </div>
+    </div>
+
+  <main id="main">
+  
+    <header>
+      <div class="header-content">
+        <i class="fas fa-brain header-icon"></i>
+        <h1>Brain Tumor Detection</h1>
+      </div>
+    </header>
+
+  <div class="container">
+    <h2>Tumor Classification Result</h2>
+
+    {% if image_url %}
+    <div style="text-align: center;">
+      <img src="{{ image_url }}" alt="Uploaded MRI Image" class="image-preview">
+    </div>
+    {% endif %}
+
+    <div class="result-box">
+      <h3>Tumor Type</h3>
+      <p>{{ tumor_type }}</p>
+      <p class="confidence">Confidence: {{ confidence }}</p>
+
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+        <a href="{{ url_for('index') }}" class="back-btn">Back to Detection</a>
+        <a href="{{ url_for('chatbot') }}" class="back-btn" style="background-color: var(--success);">
+          <i class="fas fa-robot btn-icon"></i>
+          Chat with NeuroAssist AI
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-header"><i class="fas fa-brain header-icon"></i>
+      <h3>Brain Tumor Detection</h3>
+    </div>
+
+    <p> An initiative by IIIT Nagpur students -- Dedicated to bring change through every step we take.</p>
+
+    <div class="footer-icons">
+      <a href="mailto:support@example.com"><i class="fas fa-envelope"></i> </a>
+      <a href="https://linkedin.com/in/yourprofile" target="_blank"><i class="fab fa-linkedin"></i></a>
+
+      <a href="https://linkedin.com/in/yourprofile" target="_blank"><i class="fab fa-facebook"></i> </a>
+      <a href="https://linkedin.com/in/yourprofile" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+
+    <hr><br>
+    <div class="footer-content">
+      <p>Brain Tumor Detection System © 2025</p>
+      <div>
+        <a href="#" target="_blank">Terms & Conditions</a>
+        <a href="#" target="_blank">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  </main>
+</body>
+
+<script>
+  setTimeout(() => {
+    document.getElementById("loading_screen").style.display = "none";
+  }, 2000);
+</script>
+
+</html>
+

@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brain Tumor Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2b6cb0;
+      --secondary: #244c91;
+      --accent: #63b3ed;
+      --light: #f7fafc;
+      --dark: #1a202c;
+      --success: #38a169;
+      --danger: #e53e3e;
+      --info: #3182ce;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+        /* loading screen */
+    .loading_screen {
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: var(--light);
+    }
+
+    .loading_spinner {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 24rem;
+    }
+
+    .loading_content h3 {
+        transform: scale(1.5);
+        margin-left: 130px;
+        margin-top: -40px;
+    }
+
+    .rotate{
+        animation: spin 1.5s linear infinite;
+        width: fit-content;
+    }
+
+    .rotate i {
+        border-radius: 50%;
+        padding: 0.3rem;
+        transform: scale(4);
+    }
+
+    @keyframes spin {
+        0% {
+        transform: rotate(0deg);
+        }
+
+        100% {
+        transform: rotate(360deg);
+        }
+    }
+
+    body {
+      background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    body.loaded main {
+      animation: fadeIn 0.8s ease;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header-icon {
+      font-size: 2.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--light);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      background: var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h2 {
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .upload-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2.5rem;
+      border: 2px dashed var(--accent);
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    .upload-box:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-input {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .file-label:hover {
+      background: var(--secondary);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .submit-btn {
+      background: var(--success);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 220px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background: #2f855a;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .submit-btn:disabled {
+      background: #e2e8f0;
+      cursor: not-allowed;
+    }
+
+    .type-btn {
+      background: var(--info);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 220px;
+    }
+
+    .type-btn:hover {
+      background: #2b6cb0;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .result-box {
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+      background: var(--light);
+      box-shadow: var(--shadow);
+    }
+
+    .tumor-detected {
+      border-left: 6px solid var(--danger);
+      background: rgba(229, 62, 62, 0.05);
+    }
+
+    .no-tumor-detected {
+      border-left: 6px solid var(--success);
+      background: rgba(56, 161, 105, 0.05);
+    }
+
+    h3 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .file-name {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      color: #718096;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    footer {
+      margin-top: auto;
+      width: 100%;
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--dark);
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-width: 500px;
+      margin: 1.5rem auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      background: white;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .spinner {
+      display: none;
+      width: 48px;
+      height: 48px;
+      margin: 1rem auto;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .result-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .result-grid {
+      display: flex;
+      flex-direction:column ;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+
+    /* @media (max-width: 768px) {
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+      }
+    } */
+
+    @media (max-width: 600px) {
+      .container {
+        width: 95%;
+        margin: 1.5rem auto;
+      }
+
+      h2 {
+        font-size: 1.75rem;
+      }
+
+      .header-icon {
+        font-size: 2rem;
+      }
+    }
+
+    .description {
+      /* border: 2px solid black; */
+      padding: 2rem;
+    }
+
+    .description p {
+      font-size: large;
+    }
+
+    .footer-icons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding:2rem ;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .footer-icons a {
+      text-decoration: none;
+      color: white;
+      font-size: medium;
+    }
+
+    .footer-icons i {
+      color: white;
+      font-size: larger;
+    }
+
+    .footer-header{
+      /* border: 2px solid white; */
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+    }
+
+    .footer-content{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .footer-content div a{
+      text-decoration: none;
+      color: white;
+    }
+
+  </style>
+</head>
+
+<div class="loading_screen" id="loading_screen">
+        <div class="loading_spinner">
+            <div class="loading_content">
+                <div class="rotate"><i class="fas fa-brain header-icon"></i></div>
+                <h3>Brain Tumor Detection</h3>
+            </div>
+        </div>
+    </div>
+
+<body class="loaded">
+
+  <main id="main-content">
+    <header>
+      <div class="header-content">
+        <i class="fas fa-brain header-icon"></i>
+        <h1>Brain Tumor Detection</h1>
+      </div>
+    </header>
+
+    <div class="description">
+      <p>This website allows you to upload MRI scans of the brain to help detect the presence of a tumor using an
+        AI-powered deep learning model.
+
+        The system analyzes the uploaded image and provides a preliminary prediction on whether a tumor is present. In
+        case of a detected tumor, you’ll also have the option to further classify the type.
+        <br><br>
+      </p>
+    </div>
+
+    <div class="container">
+      <h2>Upload MRI Scan</h2>
+      <form method="POST" enctype="multipart/form-data" class="upload-box" id="upload-form">
+        <input type="file" name="image" id="image" class="file-input" accept="image/*" required>
+        <label for="image" class="file-label">
+          <i class="fas fa-upload"></i> Choose MRI Image
+        </label>
+        <span class="file-name" id="file-name">No file chosen</span>
+
+        <div class="image-preview" id="image-preview">
+          <img id="preview-image" src="#" alt="MRI Preview">
+        </div>
+
+        <input type="submit" value="Analyze Scan" class="submit-btn" id="submit-btn">
+        <div class="spinner" id="spinner"></div>
+      </form>
+
+
+      {% if prediction %}
+
+
+
+      <div
+        class="result-box {% if prediction == 'No Tumor Detected' %}no-tumor-detected{% else %}tumor-detected{% endif %}">
+        <div class="result-content">
+          <h3>Analysis Result</h3>
+          <p>{{ prediction }}</p>
+          <!-- <p>Prediction</p> -->
+
+          <div class="result-grid">
+            <!-- {% if image_url %} -->
+            <div class="image-preview" style="display: block;">
+              <img src="{{ image_url }}" alt="Analyzed MRI">
+            </div>
+            {% endif %}
+
+            <div class="result-text">
+              {% if show_type_option and prediction == 'Tumor Detected' %}
+              <a href="{{ url_for('classify') }}" class="type-btn">
+                <!-- <a href="second_page.html" class="type-btn"> -->
+                <i class="fas fa-diagnoses"></i> Determine Tumor Type
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <footer>
+      <div class="footer-header"><i class="fas fa-brain header-icon"></i>
+        <h3>Brain Tumor Detection</h3></div>
+
+        <p> An initiative by IIIT Nagpur students -- Dedicated to bring change through every step we take.</p>
+
+        <div class="footer-icons">
+          <a href="mailto:support@example.com"><i class="fas fa-envelope"></i> </a>
+          <a href="https://linkedin.com/in/yourprofile" target="_blank"><i class="fab fa-linkedin"></i></a>
+        
+       <a href="https://linkedin.com/in/yourprofile" target="_blank"><i
+              class="fab fa-facebook"></i> </a>
+          <a href="https://linkedin.com/in/yourprofile" target="_blank"><i class="fab fa-instagram"></i></a> 
+      </div>
+
+        <hr><br>
+      <div class="footer-content"><p>Brain Tumor Detection System © 2025</p>
+            <div>
+            <a href="#" target="_blank">Terms & Conditions</a>
+            <a href="#" target="_blank">Privacy Policy</a>
+            </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+
+  setTimeout(() => {
+    document.getElementById("loading_screen").style.display = "none";
+  }, 1500);
+
+    // Display the selected file name and preview
+    document.getElementById('image').addEventListener('change', function (e) {
+      const fileInput = e.target;
+      const fileName = fileInput.files[0] ? fileInput.files[0].name : 'No file chosen';
+      document.getElementById('file-name').textContent = fileName;
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        const preview = document.getElementById('preview-image');
+        const previewContainer = document.getElementById('image-preview');
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          previewContainer.style.display = 'block';
+        }
+
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+    });
+
+    // Show loading spinner when form is submitted
+    document.getElementById('upload-form').addEventListener('submit', function () {
+      const submitBtn = document.getElementById('submit-btn');
+      const spinner = document.getElementById('spinner');
+
+      submitBtn.disabled = true;
+      submitBtn.value = "Analyzing...";
+      spinner.style.display = 'block';
+    });
+  </script>
+</body>
+
+</html>
+
+// final deploy main page

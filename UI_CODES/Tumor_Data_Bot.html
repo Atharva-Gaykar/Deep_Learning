@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroAssist | AI Consultation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary: #0e7490;
+            --accent: #06b6d4;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-header-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .chat-header-text h1 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .chat-header-text p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            line-height: 1.5;
+            position: relative;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .ai-message {
+            background: rgba(6, 182, 212, 0.08);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .ai-avatar {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .user-avatar {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .ai-sender {
+            color: var(--accent);
+        }
+
+        .user-sender {
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        .user-message .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ai-message .message-time {
+            color: var(--gray);
+        }
+
+        .chat-input {
+            padding: 1.25rem;
+            background: white;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                height: 90vh;
+                margin: 1rem auto;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-header">
+            <div class="chat-header-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-header-text">
+                <h1>NeuroAssist AI</h1>
+                <p>Specialized in brain tumor consultation</p>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Initial AI message -->
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <div class="message-avatar ai-avatar">
+                            <i class="fas fa-robot" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="message-sender ai-sender">NeuroAssist</div>
+                    </div>
+                    <p>Hello! I'm NeuroAssist, your AI specialist for brain tumor information. I can help explain your diagnosis, treatment options, and answer general questions. Please remember I don't replace professional medical advice. How can I assist you today?</p>
+                    <div class="message-time">{{ current_time }}</div>
+                </div>
+
+                <!-- Previous messages -->
+                {% for message in conversation_history %}
+                    {% if message.role == 'user' %}
+                        <div class="message user-message">
+                            <div class="message-header">
+                                <div class="message-avatar user-avatar">YO</div>
+                                <div class="message-sender user-sender">You</div>
+                            </div>
+                            <p>{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp }}</div>
+                        </div>
+                    {% else %}
+                        <div class="message ai-message">
+                            <div class="message-header">
+                                <div class="message-avatar ai-avatar">
+                                    <i class="fas fa-robot" style="font-size: 0.9rem;"></i>
+                                </div>
+                                <div class="message-sender ai-sender">NeuroAssist</div>
+                            </div>
+                            <p>{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp }}</div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- New response -->
+                {% if response %}
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <div class="message-avatar ai-avatar">
+                            <i class="fas fa-robot" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="message-sender ai-sender">NeuroAssist</div>
+                    </div>
+                    <p>{{ response }}</p>
+                    <div class="message-time">{{ current_time }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="POST" class="chat-input">
+                <input type="text" name="user_input" placeholder="Ask about your diagnosis..." required autofocus>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-scroll to bottom of chat
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Focus input field on page load
+        document.querySelector('input[name="user_input"]').focus();
+    </script>
+</body>
+</html>
